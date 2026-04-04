@@ -19,8 +19,8 @@ return new class extends Migration
             $table->text('purpose');
             $table->text('address');
             $table->string('phone_number');
-            $table->integer('account_number');
-            $table->integer('amount');
+            $table->bigInteger('account_number');
+            $table->bigInteger('amount');
             $table->integer('tenor');
             $table->date('request_date');
             $table->enum('status', ['pending', 'approved', 'success'])->default('pending');

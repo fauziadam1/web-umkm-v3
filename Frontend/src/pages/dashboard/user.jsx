@@ -1,4 +1,5 @@
 import { Header } from "@/components/header";
+import { LoanUser } from "@/components/loan-user";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
@@ -12,19 +13,32 @@ import { toast } from "sonner";
 export default function DashboardUser() {
   const { user, loading } = useAuth();
   const [loans, setLoans] = useState([]);
+  const [loadLoans, setLoadLoans] = useState(false);
+
+  const fetchLoan = async () => {
+    setLoadLoans(true);
+    try {
+      const res = await api.get("/api/user/loans");
+      setLoans(res.data.data);
+      console.log(res.data.data);
+    } catch (errors) {
+      toast.error(errors.response?.data?.message);
+    } finally {
+      setLoadLoans(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchLoan = async () => {
-      try {
-        const res = await api.get("/api/user/loans");
-        setLoans(res.data.data);
-      } catch (errors) {
-        toast.error(errors.response?.data?.message);
-      }
-    };
+    fetchLoan();
+  }, []);
 
-    fetchLoan(loans);
-  }, [loans]);
+  if (loadLoans) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner className="size-10" />
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -36,7 +50,7 @@ export default function DashboardUser() {
 
   return (
     <div className="w-full min-h-screen">
-      <Header />
+        <Header />
       <div className="w-full min-h-screen flex items-center justify-center px-5">
         {loans.filter((l) => l.user_id === user.id).length === 0 ? (
           <div className="flex flex-col items-center gap-4">
@@ -64,7 +78,7 @@ export default function DashboardUser() {
             </Card>
           </div>
         ) : (
-          <div></div>
+          <LoanUser loans={loans} fetchLoans={fetchLoan} />
         )}
       </div>
     </div>
