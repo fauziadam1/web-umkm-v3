@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WalletController;
@@ -27,3 +28,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/register', [UserController::class, 'register']);
+
+Route::get('/document/download/{id}', [DocumentController::class, 'download']);

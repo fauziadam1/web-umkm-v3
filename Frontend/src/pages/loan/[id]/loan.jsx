@@ -10,7 +10,13 @@ import {
 } from "@/components/ui/field";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
-import { ArrowLeft, CircleCheck, CircleX, Download } from "lucide-react";
+import {
+  ArrowLeft,
+  CircleCheck,
+  CircleX,
+  Download,
+  FileText,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { toast } from "sonner";
@@ -74,7 +80,7 @@ export default function LoanDetailPage() {
       <Header />
       <div className="w-full py-20 px-5 flex items-center justify-center">
         {loans.map((l) => (
-          <div key={l.id} className="sm:max-w-2xl lg:max-w-4xl space-y-5">
+          <div key={l.id} className="w-full sm:max-w-2xl lg:max-w-4xl space-y-5">
             <div className="space-y-8">
               <div className="flex items-center justify-between">
                 <span>
@@ -146,15 +152,25 @@ export default function LoanDetailPage() {
                       .filter((d) => d.type === "ktp")
                       .map((d) => {
                         const fileName = d.path.split("/").pop();
+                        const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(
+                          fileName,
+                        );
 
                         return (
-                          <div key={d.id}>
+                          <div key={d.id} className="mb-2">
                             <div className="border p-2 rounded-lg flex items-center gap-2">
-                              <img
-                                src={`http://localhost:8000/storage/${d.path}`}
-                                alt="ktp"
-                                className="w-8 h-8 rounded-md border"
-                              />
+                              {isImage ? (
+                                <img
+                                  src={`http://localhost:8000/storage/${d.path}`}
+                                  alt={fileName}
+                                  className="w-10 h-10 rounded-md border object-cover"
+                                />
+                              ) : (
+                                <div className="w-10 h-10 flex items-center justify-center bg-gray-100 border rounded-md">
+                                  <FileText />
+                                </div>
+                              )}
+
                               <h1 className="text-muted-foreground truncate">
                                 {fileName}
                               </h1>
@@ -183,15 +199,24 @@ export default function LoanDetailPage() {
                       .filter((d) => d.type === "npwp")
                       .map((d) => {
                         const fileName = d.path.split("/").pop();
+                        const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(
+                          fileName,
+                        );
 
                         return (
-                          <div key={d.id}>
+                          <div key={d.id} className="mb-2">
                             <div className="border p-2 rounded-lg flex items-center gap-2">
-                              <img
-                                src={`http://localhost:8000/storage/${d.path}`}
-                                alt="ktp"
-                                className="w-8 h-8 rounded-md border"
-                              />
+                              {isImage ? (
+                                <img
+                                  src={`http://localhost:8000/storage/${d.path}`}
+                                  alt={fileName}
+                                  className="w-10 h-10 rounded-md border object-cover"
+                                />
+                              ) : (
+                                <div className="flex items-center justify-center">
+                                  <FileText />
+                                </div>
+                              )}
                               <h1 className="text-muted-foreground truncate">
                                 {fileName}
                               </h1>
@@ -213,34 +238,87 @@ export default function LoanDetailPage() {
                       })}
                   </div>
                 </div>
+              </div>
+              <div className="space-y-2">
+                <h1 className="font-medium">Installments</h1>
+                <div className="overflow-x-auto border rounded-lg">
+                  <table className="w-full min-w-175">
+                    <thead className="bg-gray-400">
+                      <tr>
+                        <th className="p-3 text-left font-semibold">
+                          Interest
+                        </th>
+                        <th className="p-3 text-left font-semibold">
+                          Principal
+                        </th>
+                        <th className="p-3 text-left font-semibold">Amount</th>
+                        <th className="p-3 text-left font-semibold">
+                          Remaining
+                        </th>
+                        <th className="p-3 text-left font-semibold">
+                          Due Date
+                        </th>
+                        <th className="p-3 text-left font-semibold">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {l.installments.map((i) => (
+                        <tr key={i.id}>
+                          <td className="p-3 text-left border-t text-sm">
+                            <span>Rp {formatRupiah(i.interest)}</span>
+                          </td>
+                          <td className="p-3 text-left border-t text-sm">
+                            <span>Rp {formatRupiah(i.principal)}</span>
+                          </td>
+                          <td className="p-3 text-left border-t text-sm">
+                            <span>Rp {formatRupiah(i.amount)}</span>
+                          </td>
+                          <td className="p-3 text-left border-t text-sm">
+                            <span>Rp {formatRupiah(i.remaining_balance)}</span>
+                          </td>
+                          <td className="p-3 text-left border-t text-sm">
+                            <span>{i.due_date}</span>
+                          </td>
+                          <td className="p-3 text-left border-t text-sm">
+                            <span
+                              className={`px-2 py-0.5 text-xs rounded-full border ${i.status === "pending" ? "bg-amber-100 text-amber-500 border-amber-200" : i.status === "approved" ? "bg-blue-100 text-blue-500 border-blue-200" : i.status === "success" ? "bg-green-100 text-green-500 border-green-200" : "bg-red-100 text-red-500 border-red-200"}`}
+                            >
+                              {i.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div>
+              {user?.role === "admin" && (
+                <div className="flex items-center justify-end gap-2">
+                  <Button variant="destructive">
+                    <CircleX /> Reject
+                  </Button>
+                  <Button onClick={() => approved(l.id)}>
+                    <CircleCheck /> Approve
+                  </Button>
+                </div>
+              )}
+              {user?.role === "manager" && (
                 <div>
-                  {user?.role === "admin" && (
+                  {l.status === "approved" ? (
                     <div className="flex items-center justify-end gap-2">
-                      <Button variant="destructive">
-                        <CircleX /> Reject
-                      </Button>
                       <Button onClick={() => approved(l.id)}>
-                        <CircleCheck /> Approve
+                        <CircleCheck /> Activate
                       </Button>
                     </div>
-                  )}
-                  {user?.role === "manager" && (
-                    <div>
-                      {l.status === "approved" ? (
-                        <div className="flex items-center justify-end gap-2">
-                          <Button onClick={() => approved(l.id)}>
-                            <CircleCheck /> Activate
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-end gap-2">
-                          <Button disabled>Waiting Admin</Button>
-                        </div>
-                      )}
+                  ) : (
+                    <div className="flex items-center justify-end gap-2">
+                      <Button disabled>Waiting Admin</Button>
                     </div>
                   )}
                 </div>
-              </div>
+              )}
             </div>
           </div>
         ))}

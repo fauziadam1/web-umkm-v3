@@ -68,7 +68,7 @@ export default function DashboardAdmin() {
               <h1 className="font-semibold text-2xl">Manage Loans</h1>
               <p className="text-muted-foreground">Dashboard Admin</p>
             </span>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
               <Card>
                 <CardContent className="flex items-center gap-3">
                   <span className="w-15 h-15 flex items-center justify-center bg-amber-100 text-amber-600 rounded-lg">
@@ -122,14 +122,14 @@ export default function DashboardAdmin() {
             </div>
           </div>
           <div className="space-y-3">
-            <div>
-              <div className="flex items-center justify-between">
-                <h1 className="font-semibold text-lg">Table Loan</h1>
-                <div className="flex items-center gap-3">
+            <div className="space-y-3">
+              <div className="flex flex-col md:flex-row items-center md:justify-between gap-2">
+                <h1 className="font-semibold text-lg w-full">Table Loan</h1>
+                <div className="flex items-center justify-end gap-3 w-full">
                   <Input
                     value={search}
                     placeholder="Search: Business name, borrowers name"
-                    className="min-w-2xl"
+                    className="w-full md:w-md xl:w-2xl"
                     onChange={(e) => setsearch(e.target.value)}
                   />
                   <Select defaultValue="all" onValueChange={handleFilterChange}>
@@ -146,47 +146,58 @@ export default function DashboardAdmin() {
                   </Select>
                 </div>
               </div>
-              <div className="overflow-x-auto border rounded-lg">
-                <table className="w-full table-fixed">
+              <div className="border overflow-x-auto rounded-lg">
+                <table className="min-w-max w-full table-fixed">
                   <thead className="bg-gray-200">
                     <tr>
-                      <th className="p-3 text-left">Business</th>
-                      <th className="p-3 text-left">Name</th>
-                      <th className="p-3 text-left">Amount</th>
-                      <th className="p-3 text-left">Status</th>
-                      <th className="p-3 text-left">Action</th>
+                      <th className="p-3 text-left font-semibold">Business</th>
+                      <th className="p-3 text-left font-semibold">Name</th>
+                      <th className="p-3 text-left font-semibold">Amount</th>
+                      <th className="p-3 text-left font-semibold">Status</th>
+                      <th className="p-3 text-left font-semibold">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {currentData.map((l) => (
-                      <tr key={l.id}>
-                        <td className="p-3 text-left border-t">
-                          <span>{l.business_name}</span>
-                        </td>
-                        <td className="p-3 text-left border-t">
-                          <span>{l.name}</span>
-                        </td>
-                        <td className="p-3 text-left border-t">
-                          <span>Rp {formatRupiah(l.amount)}</span>
-                        </td>
-                        <td className="p-3 text-left border-t">
-                          <span
-                            className={`px-2 py-0.5 text-xs rounded-full border ${l.status === "pending" ? "bg-amber-100 text-amber-500 border-amber-200" : l.status === "approved" ? "bg-blue-100 text-blue-500 border-blue-200" : l.status === "success" ? "bg-green-100 text-green-500 border-green-200" : "bg-red-100 text-red-500 border-red-200"}`}
-                          >
-                            {l.status}
-                          </span>
-                        </td>
-                        <td className="p-3 text-left border-t">
-                          <span>
-                            <Link to={`/loan/${l.id}`}>
-                              <Button>
-                                <Eye /> More
-                              </Button>
-                            </Link>
-                          </span>
+                    {currentData.length ? (
+                      currentData.map((l) => (
+                        <tr key={l.id}>
+                          <td className="p-3 text-left border-t">
+                            <span>{l.business_name}</span>
+                          </td>
+                          <td className="p-3 text-left border-t">
+                            <span>{l.name}</span>
+                          </td>
+                          <td className="p-3 text-left border-t">
+                            <span>Rp {formatRupiah(l.amount)}</span>
+                          </td>
+                          <td className="p-3 text-left border-t">
+                            <span
+                              className={`px-2 py-0.5 text-xs rounded-full border ${l.status === "pending" ? "bg-amber-100 text-amber-500 border-amber-200" : l.status === "approved" ? "bg-blue-100 text-blue-500 border-blue-200" : l.status === "success" ? "bg-green-100 text-green-500 border-green-200" : "bg-red-100 text-red-500 border-red-200"}`}
+                            >
+                              {l.status}
+                            </span>
+                          </td>
+                          <td className="p-3 text-left border-t">
+                            <span>
+                              <Link to={`/loan/${l.id}`}>
+                                <Button>
+                                  <Eye /> More
+                                </Button>
+                              </Link>
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="5"
+                          className="text-center p-3 py-5 text-muted-foreground"
+                        >
+                          No data found.
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
