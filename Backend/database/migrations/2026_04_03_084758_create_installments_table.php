@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('installment_number');
             $table->date('due_date');
+            $table->date('pay_date')->nullable();
             $table->decimal('amount', 15, 2);
             $table->decimal('principal', 15, 2);
             $table->decimal('interest', 15, 2);

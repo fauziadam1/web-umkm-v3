@@ -16,7 +16,7 @@ import { useNavigate } from "react-router";
 import { useState } from "react";
 import { Spinner } from "./ui/spinner";
 
-export function AlertDialogDeleteLoan({ loans }) {
+export function AlertDialogDeleteLoan({ loans, fetchLoan }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -26,6 +26,7 @@ export function AlertDialogDeleteLoan({ loans }) {
       await api.delete(`/api/loan/${id}`);
       toast.success("Loan Canceled");
       navigate("/dashboard/user");
+      fetchLoan();
     } catch (errors) {
       toast.error(errors.response?.data?.message);
     } finally {

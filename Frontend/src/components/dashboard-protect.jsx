@@ -9,7 +9,7 @@ export function DashboardProtect({ children }) {
   const roleRedirect = {
     user: "/dashboard/user",
     admin: "/dashboard/admin",
-    manager: "/dashboard/user",
+    manager: "/dashboard/manager",
   };
 
   if (loading) {

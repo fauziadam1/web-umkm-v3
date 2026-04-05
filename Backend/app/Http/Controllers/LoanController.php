@@ -7,7 +7,6 @@ use App\Models\Installment;
 use App\Models\Loan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 use function Symfony\Component\Clock\now;
 
@@ -16,6 +15,15 @@ class LoanController extends Controller
     public function all()
     {
         $loan = Loan::with('installments', 'documents')->get();
+
+        return response()->json([
+            'data' => $loan
+        ], 200);
+    }
+
+    public function byId($id)
+    {
+        $loan = Loan::with('installments', 'documents')->findOrFail($id);
 
         return response()->json([
             'data' => $loan
@@ -109,8 +117,6 @@ class LoanController extends Controller
             'ktp.*' => 'file|mimes:png,jpeg,jpg,webp,pdf|max:5120',
             'npwp' => 'sometimes|required|array',
             'npwp.*' => 'file|mimes:png,jpeg,jpg,webp,pdf|max:5120',
-            'delete_documents' => 'sometimes|array',
-            'delete_documents.*' => 'integer|exists:documents,id',
         ]);
 
         if ($loan->status === "approved" || $loan->status === "success") {
@@ -118,17 +124,6 @@ class LoanController extends Controller
                 'message' => "Cannot update"
             ], 401);
         };
-
-        if ($request->has('delete_documents')) {
-            $documents = Document::whereIn('id', $request->delete_documents)
-                ->where('loan_id', $loan->id)
-                ->get();
-
-            foreach ($documents as $doc) {
-                Storage::disk('public')->delete($doc->path);
-                $doc->delete();
-            }
-        }
 
         $data = $request->only([
             'name',

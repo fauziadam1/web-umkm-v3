@@ -25,4 +25,15 @@ class DocumentController extends Controller
             basename($path)
         );
     }
+
+    public function destroy($id)
+    {
+        $doc = Document::findOrFail($id);
+
+        $doc->delete();
+
+        return response()->json([
+            'message' => 'Document deleted'
+        ]);
+    }
 }

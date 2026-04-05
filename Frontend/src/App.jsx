@@ -8,6 +8,7 @@ import Home from "./pages/home";
 import { DashboardProtect } from "./components/dashboard-protect";
 import DashboardAdmin from "./pages/dashboard/admin";
 import LoanDetailPage from "./pages/loan/[id]/loan";
+import DashboardManager from "./pages/dashboard/manager";
 
 function App() {
   return (
@@ -31,6 +32,14 @@ function App() {
             element={
               <DashboardProtect>
                 <DashboardAdmin />
+              </DashboardProtect>
+            }
+          />
+          <Route
+            path="/dashboard/manager"
+            element={
+              <DashboardProtect>
+                <DashboardManager />
               </DashboardProtect>
             }
           />

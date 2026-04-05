@@ -3,6 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Pagination,
   PaginationContent,
   PaginationItem,
@@ -10,32 +17,30 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { api } from "@/lib/api";
 import { CircleCheck, Clock, Eye, TrendingUp, UsersRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
-export default function DashboardAdmin() {
+export default function DashboardManager() {
   const [loans, setloans] = useState([]);
   const [search, setsearch] = useState("");
+  const [loading, setloading] = useState(false);
   const [currentPage, setcurrentPage] = useState(1);
   const [filterStatus, setfilterStatus] = useState("all");
 
   useEffect(() => {
     const fetchLoans = async () => {
+      setloading(true);
       try {
         const res = await api.get("/api/loans");
         setloans(res.data.data);
       } catch (errors) {
         toast.error(errors.reponse?.data?.message);
+      } finally {
+        setloading(false);
       }
     };
     fetchLoans();
@@ -62,6 +67,14 @@ export default function DashboardAdmin() {
     return matchStatus && matchSearch;
   });
 
+  if (loading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spinner className="size-10" />
+      </div>
+    );
+  }
+
   const totalPages = Math.ceil(filterData.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentData = filterData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
@@ -74,7 +87,7 @@ export default function DashboardAdmin() {
           <div className="flex flex-col gap-3">
             <span>
               <h1 className="font-semibold text-2xl">Manage Loans</h1>
-              <p className="text-muted-foreground">Dashboard Admin</p>
+              <p className="text-muted-foreground">Dashboard Manager</p>
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
               <Card>
